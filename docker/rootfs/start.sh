@@ -70,7 +70,7 @@ echo ' [+] Starting php'
 php-fpm7
 
 echo ' [+] Setting permissions'
-chown -R nginx:nginx /var/www/
+find /var/www/data ! -user nginx -exec chown nginx:nginx {} +
 
 echo ' [+] Creating config'
 
