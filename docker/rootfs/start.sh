@@ -35,6 +35,7 @@ _buildConfig() {
     echo "define('ALLOW_BLOATING', ${ALLOW_BLOATING:-false});"
     echo "define('SHOW_ERRORS', ${SHOW_ERRORS:-false});"
     echo "define('JPEG_COMPRESSION', ${JPEG_COMPRESSION:-90});"
+    echo "define('JPEG_CLEAN_METADATA', ${JPEG_CLEAN_METADATA:-true});"
     echo "define('PNG_COMPRESSION', ${PNG_COMPRESSION:-6});"
     echo "define('ALT_FOLDER', '${ALT_FOLDER:-}');"
     echo "define('S3_BUCKET', '${S3_BUCKET:-}');"
@@ -68,6 +69,7 @@ fi
 echo ' [+] Starting php'
 php-fpm7
 
+echo ' [+] Setting permissions'
 chown -R nginx:nginx /var/www/
 
 echo ' [+] Creating config'

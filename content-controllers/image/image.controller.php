@@ -25,43 +25,46 @@ class ImageController implements ContentController
             case 18: $ext = 'webp';break; // webp
 
             case 2:
-                //we clean up exif data of JPGs so GPS and other data is removed
-                $res = imagecreatefromjpeg($tmpfile);
+                if (JPEG_CLEAN_METADATA) {
+                    //we clean up metadata of JPGs so GPS and other data is removed
+                    $res = imagecreatefromjpeg($tmpfile);
 
-                // rotate based on EXIF Orientation
-                $exif = exif_read_data($tmpfile);
-                if (!empty($exif['Orientation'])) {
-                    switch ($exif['Orientation']) {
-                        case 2:
-                            imageflip($res, IMG_FLIP_HORIZONTAL);
-                        case 1:
-                            // Nothing to do
-                            break;
+                    // rotate based on EXIF Orientation
+                    $exif = exif_read_data($tmpfile);
+                    if (!empty($exif['Orientation'])) {
+                        switch ($exif['Orientation']) {
+                            case 2:
+                                imageflip($res, IMG_FLIP_HORIZONTAL);
+                            case 1:
+                                // Nothing to do
+                                break;
 
-                        case 4:
-                            imageflip($res, IMG_FLIP_HORIZONTAL);
-                            // Also rotate
-                        case 3:
-                            $res = imagerotate($res, 180, 0);
-                            break;
+                            case 4:
+                                imageflip($res, IMG_FLIP_HORIZONTAL);
+                                // Also rotate
+                            case 3:
+                                $res = imagerotate($res, 180, 0);
+                                break;
 
-                        case 5:
-                            imageflip($res, IMG_FLIP_VERTICAL);
-                            // Also rotate
-                        case 6:
-                            $res = imagerotate($res, -90, 0);
-                            break;
+                            case 5:
+                                imageflip($res, IMG_FLIP_VERTICAL);
+                                // Also rotate
+                            case 6:
+                                $res = imagerotate($res, -90, 0);
+                                break;
 
-                        case 7:
-                            imageflip($res, IMG_FLIP_VERTICAL);
-                            // Also rotate
-                        case 8:
-                            $res = imagerotate($res, 90, 0);
-                            break;
+                            case 7:
+                                imageflip($res, IMG_FLIP_VERTICAL);
+                                // Also rotate
+                            case 8:
+                                $res = imagerotate($res, 90, 0);
+                                break;
+                        }
                     }
+
+                    imagejpeg($res, $tmpfile, (defined('JPEG_COMPRESSION')?JPEG_COMPRESSION:90));
                 }
 
-                imagejpeg($res, $tmpfile, (defined('JPEG_COMPRESSION')?JPEG_COMPRESSION:90));
                 $ext = 'jpg';
             break;
 
@@ -95,6 +98,7 @@ class ImageController implements ContentController
         include_once(dirname(__FILE__).DS.'resize.php');
         include_once(dirname(__FILE__).DS.'filters.php');
         include_once(dirname(__FILE__).DS.'conversion.php');
+        include_once(dirname(__FILE__).DS.'utils.php');
 
         //don't do this if it's a gif because PHP can't handle animated gifs
         if($type!='gif')
@@ -217,7 +221,14 @@ class ImageController implements ContentController
                 }
 
                 $this->saveObjOfImage($im,$newpath,$type);
+
+                // Need to copy EXIF data over from the original image
+                if (in_array($type, ['jpg', 'jpeg']) && !JPEG_CLEAN_METADATA) {
+                    transferIptcExif2File($path, $newpath);
+                }
             }
+
+
             $path = $newpath;
             
         }
