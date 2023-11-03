@@ -69,6 +69,7 @@ fi
 echo ' [+] Starting php'
 php-fpm7
 
+echo ' [+] Setting permissions'
 chown -R nginx:nginx /var/www/
 
 echo ' [+] Creating config'
