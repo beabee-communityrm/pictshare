@@ -1,6 +1,6 @@
 FROM alpine:3.14.2
 
-RUN apk add --no-cache bash socat wget curl nginx file ffmpeg unzip \
+RUN apk add --no-cache bash socat wget curl nginx file ffmpeg unzip tini \
         php7-fileinfo \
         php7-session \
         zlib \
@@ -60,4 +60,4 @@ VOLUME /var/www/data
 
 EXPOSE 80
 
-ENTRYPOINT ["/etc/start.sh"]
+ENTRYPOINT ["tini", "--", "/etc/start.sh"]
