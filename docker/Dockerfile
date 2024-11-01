@@ -58,6 +58,11 @@ WORKDIR /var/www/
 #VOLUME /var/lib/influxdb
 VOLUME /var/www/data
 
+# Only accept image uploads
+ENV CONTENTCONTROLLERS=IMAGE
+# Don't clean JPEG metadata
+ENV JPEG_CLEAN_METADATA=false
+
 EXPOSE 80
 
 ENTRYPOINT ["tini", "--", "/etc/start.sh"]
